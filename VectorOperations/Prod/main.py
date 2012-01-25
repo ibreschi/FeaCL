@@ -4,9 +4,12 @@
 
 import pyopencl as cl
 import numpy
+import pdb
 
 class CL:
 	def __init__(self):
+		import os
+		os.environ['PYOPENCL_COMPILER_OUTPUT']="1"
 		self.ctx = cl.create_some_context()
 		self.queue = cl.CommandQueue(self.ctx)
 
@@ -19,24 +22,20 @@ class CL:
 		self.program = cl.Program(self.ctx, fstr).build()
 
 	def popCorn(self):
+
 		mf = cl.mem_flags
 
 		#initialize client side (CPU) arrays
-		self.a = numpy.array(range(10), dtype=numpy.float32)
-		self.b = numpy.array(range(10), dtype=numpy.float32)
+
+		self.mat = numpy.array(range(16), dtype=numpy.float32)*2.0
+		self.vec = numpy.array(range(4), dtype=numpy.float32)*3.0
+		self.res = numpy.array(range(4), dtype=numpy.float32)		
 
 		#create OpenCL buffers
-		self.a_buf = cl.Buffer(self.ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=self.a)
-		self.b_buf = cl.Buffer(self.ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=self.b)
-		self.dest_buf = cl.Buffer(self.ctx, mf.WRITE_ONLY, self.b.nbytes)
+		self.mat_buf = cl.Buffer(self.ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=self.mat)
+		self.vec_buf = cl.Buffer(self.ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=self.vec)
+		self.res_buf = cl.Buffer(self.ctx, mf.WRITE_ONLY, size=self.res.nbytes)
 
-	def execute(self):
-		self.program.part1(self.queue, self.a.shape, None, self.a_buf, self.b_buf, self.dest_buf)
-		ris = numpy.empty_like(self.a)
-		cl.enqueue_copy(self.queue, ris, self.dest_buf)
-		print "a", self.a
-		print "b", self.b
-		print "ris", ris
 
 if __name__ == "__main__":
 	example = CL()

@@ -5,6 +5,7 @@
 import pyopencl as cl
 import numpy
 
+
 class CL:
 	def __init__(self):
 		self.ctx = cl.create_some_context()
