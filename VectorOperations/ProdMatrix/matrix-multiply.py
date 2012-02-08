@@ -50,10 +50,10 @@ class CL:
 		assert b_width % block_size == 0
 
 		#cheking work_item_sizes
-		for dev in self.ctx.devices:
-			print dev.max_work_group_size
-			print "max_mem_alloc_size: ",dev.max_mem_alloc_size
-			print "max_parameter_size: ",dev.max_parameter_size
+		#for dev in self.ctx.devices:
+			#print dev.max_work_group_size
+			#print "max_mem_alloc_size: ",dev.max_mem_alloc_size
+			#print "max_parameter_size: ",dev.max_parameter_size
 
 		# init kernel parameters
 		self.kernel_params = {"block_size":block_size, "w_a":self.a_width,"h_a":a_height,"w_b":b_width}
@@ -72,11 +72,11 @@ class CL:
 		# warmup ------------------------------------
 		for i in range(5):
 			event = kernel(self.queue,self.h_c.shape, None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
-			print " A  ", event.command_execution_status
-			print " B  ", event.command_queue
-			print " C  ", event.command_type
-			print " D  ", event.context
-			print " E  ", event.reference_count
+			#print " A  ", event.command_execution_status
+			#print " B  ", event.command_queue
+			#print " C  ", event.command_type
+			#print " D  ", event.context
+			#print " E  ", event.reference_count
 		event.wait()
 		#benchmark ---------------------------------
 		t1= time()
@@ -90,7 +90,7 @@ class CL:
 		self.pull_time = time()-t1
 		#print "a", self.h_a
 		#print "b", self.h_b
-		#print "ris", self.h_c
+		print "ris", self.h_c
 
 	def timeOutput(self):
 		gpu_total_time = self.gpu_time+self.push_time+self.pull_time

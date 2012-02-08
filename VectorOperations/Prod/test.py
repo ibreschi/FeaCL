@@ -29,7 +29,6 @@ for device in ctx.devices:
 	print "Vendor: ",device.vendor
 	print "Vendor_id: ",device.vendor_id
 	print "Versione: ",device.version
-	print "max_work_item_sizes: ",device.max_work_item_sizes
 	print "max_constant_args: ",device.max_constant_args
 	print "max_constant_buffer_size: ",device.max_constant_buffer_size
 	print "max_mem_alloc_size: ",device.max_mem_alloc_size
@@ -38,9 +37,11 @@ for device in ctx.devices:
 	print "max_samplers: ",device.max_samplers
 	print "max_work_item_dimensions: ",device.max_work_item_dimensions
 	print "max_work_item_sizes: ",device.max_work_item_sizes
+	print "max_max_work_group_size",device.max_work_group_size
 	print "max_write_image_args: ",device.max_write_image_args
 	print "mem_base_addr_align: ",device.mem_base_addr_align
 	print "min_data_type_align_size: ",device.min_data_type_align_size
+
 
 
 
