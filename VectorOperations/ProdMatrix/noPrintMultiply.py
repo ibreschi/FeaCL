@@ -14,8 +14,8 @@ class CL:
 		self.queue = cl.CommandQueue(self.ctx,properties=cl.command_queue_properties.PROFILING_ENABLE)
 
 	def popCorn(self):
-		block_size = 1
-		self.a_width = 5 * block_size
+		block_size = 20
+		self.a_width = 30 * block_size
 		a_height = 10 * block_size
 		b_width = 5 * block_size
 		b_height = self.a_width
@@ -59,6 +59,9 @@ class CL:
 	
 	def execute(self):
 		kernel = self.program.matrixMul
+		print "topo"
+		print self.h_c.shape
+		print self.d_c_buf,self.d_a_buf,self.d_b_buf 
 		self.event = kernel(self.queue,self.h_c.shape,None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
 		cl.enqueue_copy(self.queue, self.h_c, self.d_c_buf)
 		print "a", self.h_a
