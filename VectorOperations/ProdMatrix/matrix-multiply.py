@@ -27,10 +27,10 @@ class CL:
 		#self.program = cl.Program(self.ctx,KERNEL_CODE%self.kernel_params).build(options=options)
 
 	def popCorn(self):
-		block_size = 1
-		self.a_width = 5 * block_size
-		a_height = 10 * block_size
-		b_width = 5 * block_size
+		self.block_size = 16
+		self.a_width = 5 * self.block_size
+		a_height = 10 * self.block_size
+		b_width = 5 * self.block_size
 		b_height = self.a_width
 		c_width = b_width
 		c_height = a_height
@@ -45,9 +45,9 @@ class CL:
 		# cheking matrix dimension A = mxn B = nxk C =m*k
 		assert self.h_a.shape[0] ==self.h_c.shape[0] and self.h_b.shape[1]==self.h_c.shape[1]
 		#cheking data sizes dimension shoudl be divisible by block_size
-		assert self.a_width % block_size == 0
-		assert a_height % block_size == 0
-		assert b_width % block_size == 0
+		assert self.a_width % self.block_size == 0
+		assert a_height % self.block_size == 0
+		assert b_width % self.block_size == 0
 
 		#cheking work_item_sizes
 		#for dev in self.ctx.devices:
@@ -56,7 +56,7 @@ class CL:
 			#print "max_parameter_size: ",dev.max_parameter_size
 
 		# init kernel parameters
-		self.kernel_params = {"block_size":block_size, "w_a":self.a_width,"h_a":a_height,"w_b":b_width}
+		self.kernel_params = {"block_size":self.block_size, "w_a":self.a_width,"h_a":a_height,"w_b":b_width}
 		mf = cl.mem_flags
 		
 		# Data transfer host -> device -------------
@@ -71,7 +71,7 @@ class CL:
 		kernel = self.program.matrixMul
 		# warmup ------------------------------------
 		for i in range(5):
-			event = kernel(self.queue,self.h_c.shape, None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
+			event = kernel(self.queue,(self.block_size,self.block_size), None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
 			#print " A  ", event.command_execution_status
 			#print " B  ", event.command_queue
 			#print " C  ", event.command_type
@@ -82,14 +82,14 @@ class CL:
 		t1= time()
 		count = 2
 		for i in range(count):
-			self.event = kernel(self.queue,self.h_c.shape,None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
+			self.event = kernel(self.queue,(self.block_size,self.block_size),None,self.d_c_buf,self.d_a_buf,self.d_b_buf)
 		self.event.wait()
 
 		self.gpu_time = (time()-t1)/(count+0.0)
 		cl.enqueue_copy(self.queue, self.h_c, self.d_c_buf)
 		self.pull_time = time()-t1
-		#print "a", self.h_a
-		#print "b", self.h_b
+		print "a", self.h_a
+		print "b", self.h_b
 		print "ris", self.h_c
 
 	def timeOutput(self):
