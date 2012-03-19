@@ -54,11 +54,13 @@ class test(object):
         self.translate = [0., 0., 0.]
         self.initrans = [0., 0., -2.]
         self.dt = np.float32(.001)
-        self.size = 100
+        self.size = 2
+        print self.size **3
         size = self.size
         self.randarr = np.random.rand(self.size, self.size, self.size)
         self.randarr = np.require(self.randarr, 'f')
         arr = [(float(x)/(size-1)-.5,float(y)/(size-1)-.5,float(z)/(size-1)-.5,1.0) for x in xrange(size) for y in xrange(size) for z in xrange(size)]
+        print len(arr)
         self.arr = np.require(arr, 'f')
         colarr = [(.5-float(x)/size+.2,float(y)/size-.5+.2,float(z)/size-.5+.2,1.0) for x in xrange(size) for y in xrange(size) for z in xrange(size)]
         self.colarr = np.require(colarr, 'f')
@@ -109,6 +111,7 @@ class test(object):
         gl.glLoadIdentity()
         glu.gluPerspective(60., self.width / float(self.height), .1, 1000.)
         gl.glMatrixMode(gl.GL_MODELVIEW)
+        
         size = self.size
         self.arrvbo = vbo.VBO(data=self.arr, usage=gl.GL_DYNAMIC_DRAW, target=gl.GL_ARRAY_BUFFER)
         self.arrvbo.bind()
@@ -170,6 +173,7 @@ class test(object):
         gl.glPointSize(5)
         gl.glEnable(gl.GL_BLEND)
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+
         self.arrvbo.bind()
         gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
         gl.glEnableClientState(gl.GL_COLOR_ARRAY)
@@ -196,12 +200,14 @@ class test(object):
 
         #Setup vertex buffer objects and share them with OpenCL as GLBuffers
         self.arrvbo.bind()
-        self.arr_cl = cl.GLBuffer(self.ctx, mf.READ_WRITE, int(self.arrvbo.buffers[0]))
+        print "bau"
+        self.arr_cl = cl.GLBuffer(self.ctx, mf.READ_WRITE, int(self.arrvbo.buffer))
+        print "bau"
         self.colvbo.bind()
-        self.col_cl = cl.GLBuffer(self.ctx, mf.READ_WRITE, int(self.colvbo.buffers[0]))
+        print "bau"
+        self.col_cl = cl.GLBuffer(self.ctx, mf.READ_WRITE, int(self.colvbo.buffer))
         
         self.randarr_cl = cl.Buffer(self.ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=self.randarr)
-
         self.arrvbo.unbind()
         self.colvbo.unbind()
         self.queue.finish()
@@ -215,6 +221,7 @@ class test(object):
         cl.enqueue_copy(self.queue, self.randarr_cl, self.randarr)
         cl.enqueue_acquire_gl_objects(self.queue, self.gl_objects).wait()
         global_size = (self.size**3,)
+        print global_size
         local_size = None
         kernelargs = (self.arr_cl, 
                       self.col_cl,
@@ -226,4 +233,3 @@ class test(object):
         
 if __name__ == '__main__':
     mytest = test()
-    print "miao"

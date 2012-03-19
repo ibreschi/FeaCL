@@ -3,11 +3,11 @@ from pyopencl.reduction import ReductionKernel
 import numpy
 from time import time 
 import os
-os.environ['PYOPENCL_COMPILER_OUTPUT']="1"
+#os.environ['PYOPENCL_COMPILER_OUTPUT']="1"
+
+
 ctx = cl.create_some_context()
 queue = cl.CommandQueue(ctx)
-
-
 
 dot = ReductionKernel (ctx, dtype_out=numpy.float32, neutral="0",
 			reduce_expr="a+b" , map_expr="x[i]*y[i]" ,

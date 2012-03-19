@@ -109,7 +109,7 @@ function InitGL(canvasName) {
     userData.modelMatrix.makeIdentity();
         
     var aspect = WINW / WINH;
-    userData.vpMatrix.perspective(30, aspect, 1, 10000);
+    userData.vpMatrix.perspective(45, aspect, 1, 10000);
     
     var cameraPosition = [0, 0, 20];
     var cameraTarget = [0, 0, 0];

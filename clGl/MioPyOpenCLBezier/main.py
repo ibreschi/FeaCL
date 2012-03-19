@@ -7,18 +7,14 @@ from OpenGL.GLUT import *
 import sys
 
 #helper modules
-#import glutil
-#from vector import Vec
+import glutil
+from vector import Vec
 
 #OpenCL code
-#import part2
+import OpenClOperations
 #functions for initial values of particles
 #import initialize
 
-#number of particles
-num = 20000
-#time step for integration
-dt = .001
 
 class window(object):
     def __init__(self, *args, **kwargs):
@@ -36,7 +32,7 @@ class window(object):
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
         glutInitWindowSize(self.width, self.height)
         glutInitWindowPosition(0, 0)
-        self.win = glutCreateWindow("Part 2: Python")
+        self.win = glutCreateWindow("Bezier")
 
         #gets called by GLUT every frame
         glutDisplayFunc(self.draw)
@@ -51,12 +47,8 @@ class window(object):
 
         #setup OpenGL scene
         self.glinit()
-
-        #set up initial conditions
-        (pos_vbo, col_vbo, vel) = initialize.fountain(num)
         #create our OpenCL instance
-        self.cle = part2.Part2(num, dt)
-        self.cle.loadData(pos_vbo, col_vbo, vel)
+        self.bez = OpenClOperations.OpenClOperations()
 
         glutMainLoop()
         
@@ -65,7 +57,7 @@ class window(object):
         glViewport(0, 0, self.width, self.height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(60., self.width / float(self.height), .1, 1000.)
+        gluPerspective(80., self.width / float(self.height), .1, 1000.)
         glMatrixMode(GL_MODELVIEW)
 
 
@@ -79,7 +71,7 @@ class window(object):
         if args[0] == ESCAPE or args[0] == 'q':
             sys.exit()
         elif args[0] == 't':
-            print self.cle.timings
+            print "t"
 
     def on_click(self, button, state, x, y):
         if state == GLUT_DOWN:
@@ -105,9 +97,6 @@ class window(object):
 
 
     def draw(self):
-        """Render the particles"""        
-        #update or particle positions by calling the OpenCL kernel
-        self.cle.execute(10) 
         glFlush()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -120,12 +109,11 @@ class window(object):
         glRotatef(self.rotate.y, 0, 1, 0) #we switched around the axis so make this rotate_z
         glTranslatef(self.translate.x, self.translate.y, self.translate.z)
         
-        #render the particles
-        #self.cle.render()
+        #render the bezier
+        self.bez.render()
 
         #draw the x, y and z axis as lines
-        #glutil.draw_axes()
-
+        glutil.draw_axes()
         glutSwapBuffers()
 
 
